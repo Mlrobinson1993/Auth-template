@@ -1,7 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-
 import { DBAuth } from '../DB/Database';
 
 export default function PrivateNav({ displayName }) {
@@ -11,14 +10,19 @@ export default function PrivateNav({ displayName }) {
 	return (
 		<Nav>
 			<LogoContainer className='logo'>
-				<Link to='/'>LOGO HERE</Link>
+				<Link exact to='/'>
+					LOGO HERE
+				</Link>
 			</LogoContainer>
 			<ListContainer>
-				<Link activeClassName='active-navlink' to='/'>
+				<Link activeClassName='active-navlink' exact to='/'>
 					Home
 				</Link>
 
-				<Link activeClassName='active-navlink' to='/account'>
+				<Link activeClassName='active-navlink' exact to='/protectedpage'>
+					Protected Page
+				</Link>
+				<Link activeClassName='active-navlink' exact to='/account'>
 					{displayName}
 				</Link>
 
@@ -58,6 +62,7 @@ const Link = styled(NavLink)`
 	color: white;
 	padding-bottom: 1px;
 	text-decoration: none;
+	transition: 0.2s ease-out;
 	border-bottom: 3px solid transparent;
 `;
 

@@ -19,6 +19,8 @@ var firebaseConfig = {
 // Initialize Firebase
 const DBInit = firebase.initializeApp(firebaseConfig);
 
+const GoogleProvider = new firebase.auth.GoogleAuthProvider();
+
 const DBAuth = DBInit.auth();
 
-export { DBAuth };
+export { DBAuth, GoogleProvider };

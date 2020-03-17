@@ -17,6 +17,11 @@ export default function VerifyEmailForm() {
 		}, 1000);
 	};
 
+	const handleRedirect = e => {
+		e.preventDefault();
+		window.location = '/';
+	};
+
 	return (
 		<FormContainer>
 			<Form onSubmit={handleSubmit}>
@@ -26,6 +31,9 @@ export default function VerifyEmailForm() {
 				{isSubmitting && <Spinner />}
 				<button type='submit' disabled={isFormSubmitted}>
 					{isFormSubmitted ? 'Email sent' : 'Send email again'}
+				</button>
+				<button type='submit' onClick={handleRedirect}>
+					I'm verified, let me in!
 				</button>
 			</Form>
 		</FormContainer>
@@ -66,7 +74,23 @@ const Form = styled.form`
 		border-radius: 5px;
 		border: none;
 		color: white;
+		cursor: pointer;
 		background-color: steelblue;
+
+		transition: 0.2s ease-out;
+		&:hover {
+			background-color: lightsteelblue;
+		}
+
+		&:last-of-type {
+			background-color: lightsteelblue;
+			margin-top: 1rem;
+
+			transition: 0.2s ease-out;
+			&:hover {
+				background-color: steelblue;
+			}
+		}
 	}
 
 	p {

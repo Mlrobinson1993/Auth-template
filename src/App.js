@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Account from './pages/Account';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import ProtectedPage from './pages/ProtectedPage';
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyEmail from './pages/VerifyEmail';
 import Spinner from './helpers/Spinner';
@@ -37,10 +38,11 @@ function App() {
 		);
 	}
 	//if user is logged in and email is verified
-	else if (activeUser) {
+	else if (activeUser && activeUser.emailVerified === true) {
 		routes = (
 			<Switch>
 				<Route Route exact path='/' component={Home} />
+				<Route Route exact path='/protectedpage' component={ProtectedPage} />
 				<Route Route exact path='/account' component={Account} />
 				<Redirect to='/' />
 			</Switch>
@@ -49,6 +51,7 @@ function App() {
 	} else if (!activeUser) {
 		routes = (
 			<Switch>
+				<Route Route exact path='/' component={Home} />
 				<Route exact path='/signin' component={SignIn} />
 				<Route exact path='/signup' component={SignUp} />
 				<Route exact path='/forgottenpassword' component={ForgotPassword} />

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 
@@ -9,15 +9,15 @@ export default function NavBar() {
 				<Link to='/'>LOGO HERE</Link>
 			</LogoContainer>
 			<ListContainer>
-				<Link activeClassName='active-navlink' to='/'>
+				<Link activeClassName='active-navlink' exact to='/'>
 					Home
 				</Link>
 
-				<Link activeClassName='active-navlink' to='/signin'>
+				<Link activeClassName='active-navlink' exact to='/signin'>
 					Sign In
 				</Link>
 
-				<Link activeClassName='active-navlink' to='/signup'>
+				<Link activeClassName='active-navlink' exact to='/signup'>
 					Sign Up
 				</Link>
 			</ListContainer>

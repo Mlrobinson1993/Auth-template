@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
-import { AuthContext } from '../context/AuthContext';
-import { DBAuth } from '../DB/Database';
+import setErrorMessage from '../helpers/setErrorMessage';
+import { DBAuth, GoogleProvider } from '../DB/Database';
 
 import Spinner from '../helpers/Spinner';
 
 export default function SignInForm() {
 	const initialValues = { email: '', password: '' };
+	const [errors, setErrors] = useState({});
 
 	const signInSchema = Yup.object().shape({
 		email: Yup.string()
@@ -24,9 +25,21 @@ export default function SignInForm() {
 				console.log('success');
 			})
 			.catch(error => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
-				console.log(`${errorCode}: ${errorMessage}`);
+				console.log(error.code);
+				console.log(error.message);
+				const errorMessage = setErrorMessage(error);
+				setErrors({ error: errorMessage });
+			});
+	};
+
+	const handleGoogleSignIn = () => {
+		DBAuth.signInWithPopup(GoogleProvider)
+			.then(res => {
+				const token = res.credential.accessToken;
+			})
+			.catch(error => {
+				console.log(error.code);
+				console.log(error.message);
 			});
 	};
 
@@ -46,6 +59,7 @@ export default function SignInForm() {
 					<Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Sign In</legend>
+						<small>{errors && errors.error}</small>
 						<InputContainer>
 							<Field
 								name='email'
@@ -78,7 +92,7 @@ export default function SignInForm() {
 							type='submit'
 							disabled={props.errors.password && props.touched.password}
 						>
-							Submit
+							Sign in
 						</button>
 					</Form>
 				)}
@@ -87,7 +101,7 @@ export default function SignInForm() {
 			<BottomContainer>
 				<Link to='/forgottenpassword'>Forgot your password?</Link>
 				<span>Or sign in with Google</span>
-				<button>Google button</button>
+				<button onClick={handleGoogleSignIn}>Google button</button>
 			</BottomContainer>
 		</FormContainer>
 	);
@@ -127,6 +141,13 @@ const Form = styled.form`
 		border: none;
 		color: white;
 		background-color: steelblue;
+	}
+	small {
+		color: red;
+		font-size: 0.8rem;
+		text-align: center;
+		margin-bottom: 0.5rem;
+		max-width: 400px;
 	}
 `;
 

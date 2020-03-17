@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Spinner from '../helpers/Spinner';
+import { DBAuth } from '../DB/Database';
+import setErrorMessage from '../helpers/setErrorMessage';
 
 export default function VerifyEmailForm() {
 	const initialValues = { email: '' };
+	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [errors, setErrors] = useState({ error: '' });
+
+	const sendPasswordResetEmail = email => {
+		DBAuth.sendPasswordResetEmail(email)
+			.then(setIsSubmitted(true))
+			.catch(error => {
+				console.log(error);
+				const errorMessage = setErrorMessage(error);
+				setErrors({ error: errorMessage });
+			});
+	};
 
 	const forgottenFormSchema = Yup.object().shape({
 		email: Yup.string()
@@ -19,8 +33,8 @@ export default function VerifyEmailForm() {
 				initialValues={initialValues}
 				validationSchema={forgottenFormSchema}
 				onSubmit={(values, actions) => {
+					sendPasswordResetEmail(values.email);
 					setTimeout(() => {
-						alert(JSON.stringify(values, null, 2));
 						actions.setSubmitting(false);
 					}, 1000);
 				}}
@@ -29,6 +43,7 @@ export default function VerifyEmailForm() {
 					<Form onSubmit={props.handleSubmit}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Forgotten your password?</legend>
+						<small>{errors && errors.error}</small>
 						<InputContainer>
 							<input
 								onChange={props.handleChange}
@@ -43,11 +58,8 @@ export default function VerifyEmailForm() {
 								{props.errors.email}
 							</Error>
 						</InputContainer>
-						<button
-							type='submit'
-							disabled={props.errors.password && props.touched.password}
-						>
-							Recover
+						<button type='submit' disabled={props.isSubmitting || isSubmitted}>
+							{!errors && isSubmitted ? 'Email sent' : 'Recover'}
 						</button>
 					</Form>
 				)}
@@ -91,6 +103,14 @@ const Form = styled.form`
 		border: none;
 		color: white;
 		background-color: steelblue;
+	}
+
+	small {
+		color: red;
+		font-size: 0.8rem;
+		text-align: center;
+		margin-bottom: 0.5rem;
+		max-width: 400px;
 	}
 `;
 

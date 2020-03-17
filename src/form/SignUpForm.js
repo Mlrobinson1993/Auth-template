@@ -1,13 +1,15 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import Spinner from '../helpers/Spinner';
-import { DBAuth } from '../DB/Database';
+import { DBAuth, GoogleProvider } from '../DB/Database';
 import { AuthContext } from '../context/AuthContext';
+import setErrorMessage from '../helpers/setErrorMessage';
 
 export default function SignUpForm() {
 	const { sendEmailVerification, setUser } = useContext(AuthContext);
+	const [errors, setErrors] = useState({});
 
 	const initialValues = {
 		name: '',
@@ -18,16 +20,24 @@ export default function SignUpForm() {
 	const signUpSchema = Yup.object().shape({
 		name: Yup.string()
 			.min(2, 'A little longer!')
-			.max(50, 'A little shorter!')
+			.max(70, 'A little shorter!')
 			.required('Name required'),
 		email: Yup.string()
 			.email('Invalid email')
 			.required('Email required'),
 		password: Yup.string()
 			.min(8, 'Password must be at least 8 characters')
-			.max(8, 'Password must be less than 24 characters')
+			.max(38, 'Password must be less than 38 characters')
 			.required('Password required'),
 	});
+
+	const handleGoogleSignUp = () => {
+		DBAuth.signInWithPopup(GoogleProvider).then(res => {
+			const token = res.credential.accessToken;
+
+			console.log(token);
+		});
+	};
 
 	const signUpUser = (email, password, name) => {
 		DBAuth.createUserWithEmailAndPassword(email, password)
@@ -42,11 +52,9 @@ export default function SignUpForm() {
 					email: email,
 				});
 			})
-
 			.catch(error => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
-				console.log(`${errorCode}: ${errorMessage}`);
+				const errorMessage = setErrorMessage(error.code);
+				setErrors({ error: errorMessage });
 			});
 	};
 	return (
@@ -58,13 +66,14 @@ export default function SignUpForm() {
 					signUpUser(values.email, values.password, values.name);
 					setTimeout(() => {
 						actions.setSubmitting(false);
-					}, 1000);
+					}, 2000);
 				}}
 			>
 				{props => (
 					<Form onSubmit={props.handleSubmit}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Create an account</legend>
+						<small>{errors && errors.error}</small>
 						<InputContainer>
 							<Field
 								name='name'
@@ -105,7 +114,7 @@ export default function SignUpForm() {
 							type='submit'
 							disabled={props.errors.password && props.touched.password}
 						>
-							Submit
+							Register
 						</button>
 					</Form>
 				)}
@@ -113,7 +122,7 @@ export default function SignUpForm() {
 
 			<BottomContainer>
 				<span>Or sign up with Google</span>
-				<button>Google button</button>
+				<button onClick={handleGoogleSignUp}>Google button</button>
 			</BottomContainer>
 		</FormContainer>
 	);
@@ -126,7 +135,6 @@ const FormContainer = styled.div`
 	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
 	border-radius: 3px;
 	padding: 3rem 5rem;
-
 	min-width: 50vw;
 	min-height: 70vh;
 `;
@@ -153,6 +161,14 @@ const Form = styled.form`
 		border: none;
 		color: white;
 		background-color: steelblue;
+	}
+
+	small {
+		color: red;
+		font-size: 0.8rem;
+		text-align: center;
+		margin-bottom: 0.5rem;
+		max-width: 400px;
 	}
 `;
 
