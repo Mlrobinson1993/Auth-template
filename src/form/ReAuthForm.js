@@ -6,42 +6,35 @@ import * as Yup from 'yup';
 import { setErrorMessage, ErrorMessage } from '../helpers/setErrorMessage';
 import { DBAuth } from '../DB/Database';
 import { AuthContext } from '../context/AuthContext';
-import GoogleButton from '../helpers/buttons/GoogleButton';
 import Spinner from '../helpers/Spinner';
 
-export default function SignInForm() {
-	const initialValues = { email: '', password: '' };
-	const { errors, setErrors, setIsLoading, isLoading } = useContext(
-		AuthContext
-	);
+export default function ReAuthForm() {
+	const { activeUser, updatePassword } = useContext(AuthContext);
+	const initialValues = { email: activeUser.email, password: '' };
 
-	const signInSchema = Yup.object().shape({
-		email: Yup.string()
-			.email('Invalid email')
-			.required('Email required'),
+	const ReAuthSchema = Yup.object().shape({
 		password: Yup.string().required('Password required'),
 	});
 
-	const signInUser = (email, password) => {
-		DBAuth.signInWithEmailAndPassword(email, password)
-			.then(res => {
-				console.log('success');
+	const reAuthenticateUser = password => {
+		const user = DBAuth.currentUser;
+		user
+			.reauthenticateWithCredential(password)
+			.then(() => {
+				updatePassword(user);
 			})
-			.catch(error => {
-				console.log(error.code);
-				console.log(error.message);
-				const errorMessage = setErrorMessage(error);
-				setErrors({ error: errorMessage });
+			.catch(function(error) {
+				// An error happened.
 			});
 	};
 
 	return (
-		<FormContainer>
+		<Container>
 			<Formik
 				initialValues={initialValues}
-				validationSchema={signInSchema}
+				validationSchema={ReAuthSchema}
 				onSubmit={(values, actions) => {
-					signInUser(values.email, values.password);
+					reAuthenticateUser(values.password);
 					setTimeout(() => {
 						actions.setSubmitting(false);
 					}, 1000);
@@ -51,21 +44,6 @@ export default function SignInForm() {
 					<Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Sign In</legend>
-						<ErrorMessage message={errors && errors.error} />
-						<InputContainer>
-							<Field
-								name='email'
-								type='email'
-								placeholder='Johnsmith@domain.com'
-								autoComplete='off'
-								onChange={props.handleChange}
-								onBlur={props.handleBlur}
-								value={props.values.name}
-							/>
-							<Error errors={props.errors.email && props.touched.email}>
-								{props.errors.email}
-							</Error>
-						</InputContainer>
 						<InputContainer>
 							<Field
 								name='password'
@@ -92,48 +70,16 @@ export default function SignInForm() {
 
 			<BottomContainer>
 				<Link to='/forgottenpassword'>Forgot your password?</Link>
-				<span style={{ textAlign: 'center', marginBottom: '1rem' }}>OR</span>
-				<GoogleButton text='Sign in with Google' />
 			</BottomContainer>
-		</FormContainer>
+		</Container>
 	);
 }
 
-const FormContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
-	border-radius: 3px;
-	padding: 3rem 5rem;
-
-	min-width: 50vw;
-	min-height: 70vh;
-`;
-
-const Form = styled.form`
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	height: 100%;
-	width: 100%;
-	margin-bottom: 2rem;
-
-	legend {
-		font-size: 2rem;
-		margin-bottom: 2rem;
-		font-weight: 600;
-		text-align: center;
-	}
-
-	button {
-		padding: 0.5rem 1rem;
-		color: white;
-		border-radius: 5px;
-		border: none;
-		color: white;
-		background-color: steelblue;
-	}
+const Container = styled.div`
+	width: 100vw;
+	height: 100vh;
+	z-index: 9999;
+	background-color: rgba(0, 0, 0, 0.8);
 `;
 
 const InputContainer = styled.div`

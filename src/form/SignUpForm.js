@@ -1,15 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import Spinner from '../helpers/Spinner';
-import { DBAuth, GoogleProvider } from '../DB/Database';
+import { DBAuth } from '../DB/Database';
 import { AuthContext } from '../context/AuthContext';
-import setErrorMessage from '../helpers/setErrorMessage';
+import { setErrorMessage, ErrorMessage } from '../helpers/setErrorMessage';
+import GoogleButton from '../helpers/buttons/GoogleButton';
 
 export default function SignUpForm() {
 	const { sendEmailVerification, setUser } = useContext(AuthContext);
-	const [errors, setErrors] = useState({});
+	const { errors, setErrors } = useContext(AuthContext);
 
 	const initialValues = {
 		name: '',
@@ -31,32 +32,26 @@ export default function SignUpForm() {
 			.required('Password required'),
 	});
 
-	const handleGoogleSignUp = () => {
-		DBAuth.signInWithPopup(GoogleProvider).then(res => {
-			const token = res.credential.accessToken;
-
-			console.log(token);
-		});
-	};
-
 	const signUpUser = (email, password, name) => {
+		setUser({
+			firstName: name.split(' ')[0],
+			lastName: name.split(' ')[name.split(' ').length - 1],
+			email: email,
+		});
+
 		DBAuth.createUserWithEmailAndPassword(email, password)
 			.then(res => {
 				res.user.updateProfile({
 					displayName: name,
 				});
 				sendEmailVerification();
-				setUser({
-					firstName: name.split(' ')[0],
-					lastName: name.split(' ')[name.split(' ').length - 1],
-					email: email,
-				});
 			})
 			.catch(error => {
 				const errorMessage = setErrorMessage(error.code);
 				setErrors({ error: errorMessage });
 			});
 	};
+
 	return (
 		<FormContainer>
 			<Formik
@@ -73,7 +68,7 @@ export default function SignUpForm() {
 					<Form onSubmit={props.handleSubmit}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Create an account</legend>
-						<small>{errors && errors.error}</small>
+						<ErrorMessage message={errors && errors.error} />
 						<InputContainer>
 							<Field
 								name='name'
@@ -121,8 +116,8 @@ export default function SignUpForm() {
 			</Formik>
 
 			<BottomContainer>
-				<span>Or sign up with Google</span>
-				<button onClick={handleGoogleSignUp}>Google button</button>
+				<span style={{ textAlign: 'center', marginBottom: '1rem' }}>OR</span>
+				<GoogleButton text='Sign in with Google' />
 			</BottomContainer>
 		</FormContainer>
 	);
@@ -162,14 +157,6 @@ const Form = styled.form`
 		color: white;
 		background-color: steelblue;
 	}
-
-	small {
-		color: red;
-		font-size: 0.8rem;
-		text-align: center;
-		margin-bottom: 0.5rem;
-		max-width: 400px;
-	}
 `;
 
 const InputContainer = styled.div`
@@ -198,10 +185,6 @@ const BottomContainer = styled.div`
 	flex-direction: column;
 	justify-content: space-around;
 	height: 40%;
-
-	span {
-		margin-bottom: 1rem;
-	}
 `;
 
 const Error = styled.div`

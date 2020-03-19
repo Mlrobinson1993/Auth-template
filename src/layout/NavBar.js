@@ -56,4 +56,5 @@ const Link = styled(NavLink)`
 	padding-bottom: 1px;
 	text-decoration: none;
 	border-bottom: 3px solid transparent;
+	transition: 0.2s ease-out;
 `;

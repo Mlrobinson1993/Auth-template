@@ -1,3 +1,17 @@
+import React from 'react';
+import styled from 'styled-components';
+
+const ErrorMsg = styled.small`
+	color: red;
+	font-size: 0.8rem;
+	text-align: center;
+	margin-bottom: 0.5rem;
+`;
+
+export default function ErrorMessage({ message }) {
+	return <ErrorMsg>{message}</ErrorMsg>;
+}
+
 const setErrorMessage = error => {
 	let errorMsg = '';
 	switch (error.code) {
@@ -25,4 +39,4 @@ const setErrorMessage = error => {
 	return errorMsg;
 };
 
-export default setErrorMessage;
+export { setErrorMessage, ErrorMessage };

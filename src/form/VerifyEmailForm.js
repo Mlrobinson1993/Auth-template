@@ -2,15 +2,16 @@ import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { AuthContext } from '../context/AuthContext';
 import Spinner from '../helpers/Spinner';
+import { ErrorMessage } from '../helpers/setErrorMessage';
 
 export default function VerifyEmailForm() {
-	const { sendEmailVerification } = useContext(AuthContext);
+	const { sendEmailVerification, errors } = useContext(AuthContext);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isFormSubmitted, setisFormSubmitted] = useState(false);
 	const handleSubmit = e => {
+		e.preventDefault();
 		setIsSubmitting(true);
 		sendEmailVerification();
-		e.preventDefault();
 		setTimeout(() => {
 			setIsSubmitting(false);
 			setisFormSubmitted(true);
@@ -28,6 +29,7 @@ export default function VerifyEmailForm() {
 				<legend>Verify your email</legend>
 				<p>We've sent a verification email over to your email address.</p>
 				<p>Don't see it?</p>
+				<ErrorMessage message={errors && errors.error} />
 				{isSubmitting && <Spinner />}
 				<button type='submit' disabled={isFormSubmitted}>
 					{isFormSubmitted ? 'Email sent' : 'Send email again'}

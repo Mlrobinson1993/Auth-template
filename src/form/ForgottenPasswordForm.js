@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Spinner from '../helpers/Spinner';
 import { DBAuth } from '../DB/Database';
-import setErrorMessage from '../helpers/setErrorMessage';
+import { setErrorMessage, ErrorMessage } from '../helpers/setErrorMessage';
+import { AuthContext } from '../context/AuthContext';
 
 export default function VerifyEmailForm() {
 	const initialValues = { email: '' };
 	const [isSubmitted, setIsSubmitted] = useState(false);
-	const [errors, setErrors] = useState({ error: '' });
+	const { errors, setErrors } = useContext(AuthContext);
 
 	const sendPasswordResetEmail = email => {
 		DBAuth.sendPasswordResetEmail(email)
@@ -43,7 +44,7 @@ export default function VerifyEmailForm() {
 					<Form onSubmit={props.handleSubmit}>
 						{props.isSubmitting && <Spinner />}
 						<legend>Forgotten your password?</legend>
-						<small>{errors && errors.error}</small>
+						<ErrorMessage message={errors && errors.error} />
 						<InputContainer>
 							<input
 								onChange={props.handleChange}

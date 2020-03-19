@@ -9,7 +9,9 @@ import { DBAuth } from '../DB/Database';
 import Spinner from '../helpers/Spinner';
 
 export default function AccountPageForm() {
-	const { activeUser, sendEmailVerification } = useContext(AuthContext);
+	const { activeUser, sendEmailVerification, user, setUser } = useContext(
+		AuthContext
+	);
 	const initialValues = { name: '', email: '', password: '' };
 	const [updateSuccessful, setUpdateSuccessful] = useState(false);
 
@@ -38,6 +40,12 @@ export default function AccountPageForm() {
 	};
 
 	const handleNameChange = (name, user) => {
+		setUser({
+			...user,
+			firstName: name.split(' ')[0],
+			lastName: name.split(' ')[name.split(' ').length - 1],
+		});
+
 		user
 			.updateProfile({
 				displayName: name,
@@ -72,7 +80,6 @@ export default function AccountPageForm() {
 
 	const handleDelete = () => {
 		const user = DBAuth.currentUser;
-
 		user
 			.delete()
 			.then((window.location = '/signin'))
@@ -107,6 +114,12 @@ export default function AccountPageForm() {
 								onBlur={props.handleBlur}
 								value={props.values.name}
 							/>
+							<button
+								type='button'
+								disabled={props.errors.password && props.touched.password}
+							>
+								{updateSuccessful ? 'Updated' : 'Update'}
+							</button>
 							<Error errors={props.errors.name && props.touched.name}>
 								{props.errors.name}
 							</Error>
@@ -121,6 +134,13 @@ export default function AccountPageForm() {
 								onBlur={props.handleBlur}
 								value={props.values.email}
 							/>
+							<button
+								type='button'
+								disabled={props.errors.password && props.touched.password}
+								onClick={handleEmailChange}
+							>
+								{updateSuccessful ? 'Updated' : 'Update'}
+							</button>
 							<Error errors={props.errors.email && props.touched.email}>
 								{props.errors.email}
 							</Error>
@@ -135,16 +155,22 @@ export default function AccountPageForm() {
 								onBlur={props.handleBlur}
 								value={props.values.password}
 							/>
+							<button
+								type='button'
+								disabled={props.errors.password && props.touched.password}
+							>
+								{updateSuccessful ? 'Updated' : 'Update'}
+							</button>
 							<Error errors={props.errors.password && props.touched.password}>
 								{props.errors.password}
 							</Error>
 						</InputContainer>
-						<button
+						{/* <button
 							type='submit'
 							disabled={props.errors.password && props.touched.password}
 						>
 							{updateSuccessful ? 'Changes Submitted' : 'Submit Changes'}
-						</button>
+						</button> */}
 					</Form>
 				)}
 			</Formik>
@@ -190,7 +216,7 @@ const Form = styled.form`
 		align-self: center;
 		border: none;
 		color: white;
-		min-width: 150px;
+		margin-left: 1rem;
 		background-color: steelblue;
 	}
 `;
@@ -198,7 +224,7 @@ const Form = styled.form`
 const InputContainer = styled.div`
 	margin-bottom: 2rem;
 	width: 100%;
-
+	display: flex;
 	input {
 		padding: 0.5rem 1rem;
 		border: none;
