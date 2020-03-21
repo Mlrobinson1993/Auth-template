@@ -47,8 +47,9 @@ export default function SignUpForm() {
 				sendEmailVerification();
 			})
 			.catch(error => {
-				const errorMessage = setErrorMessage(error.code);
+				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
+				console.log(error);
 			});
 	};
 

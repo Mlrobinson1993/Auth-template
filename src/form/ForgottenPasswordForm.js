@@ -1,11 +1,14 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
+import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 import Spinner from '../helpers/Spinner';
 import { DBAuth } from '../DB/Database';
 import { setErrorMessage, ErrorMessage } from '../helpers/setErrorMessage';
 import { AuthContext } from '../context/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function VerifyEmailForm() {
 	const initialValues = { email: '' };
@@ -19,6 +22,9 @@ export default function VerifyEmailForm() {
 				console.log(error);
 				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
+			})
+			.then(() => {
+				window.location = '/emailsent';
 			});
 	};
 
@@ -30,6 +36,9 @@ export default function VerifyEmailForm() {
 
 	return (
 		<FormContainer>
+			<BackBtn to='/signin'>
+				<FontAwesomeIcon icon={faArrowLeft} />
+			</BackBtn>
 			<Formik
 				initialValues={initialValues}
 				validationSchema={forgottenFormSchema}
@@ -145,4 +154,20 @@ const Error = styled.div`
 	opacity: ${props => (props.errors ? 1 : 0)};
 	transform: ${props =>
 		props.errors ? 'translateY(5px)' : 'translateY(-20px)'};
+`;
+
+const BackBtn = styled(Link)`
+	border: none;
+	outline: none;
+	cursor: pointer;
+	position: relative;
+	justify-self: flex-start;
+	align-self: flex-start;
+	transform: translate(-50px, -100px);
+	color: black;
+	transition: 0.2s ease-out;
+
+	&:hover {
+		color: steelblue;
+	}
 `;

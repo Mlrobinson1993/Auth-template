@@ -23,4 +23,4 @@ const GoogleProvider = new firebase.auth.GoogleAuthProvider();
 
 const DBAuth = DBInit.auth();
 
-export { DBAuth, GoogleProvider };
+export { DBAuth, GoogleProvider, firebase };

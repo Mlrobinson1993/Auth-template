@@ -13,6 +13,7 @@ export default function ErrorMessage({ message }) {
 }
 
 const setErrorMessage = error => {
+	console.log(error);
 	let errorMsg = '';
 	switch (error.code) {
 		case 'auth/user-not-found':
@@ -32,7 +33,7 @@ const setErrorMessage = error => {
 			errorMsg = 'Invalid username or password';
 			break;
 		default:
-			errorMsg = 'Unknown error occured, please try again';
+			errorMsg = 'Unknown error occurred, please try again';
 			break;
 	}
 

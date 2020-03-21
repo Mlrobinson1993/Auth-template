@@ -21,7 +21,7 @@ export default function GoogleButton({ text }) {
 		<>
 			<GoogleBtn
 				type='button'
-				class='google-button'
+				className='google-button'
 				onClick={handleGoogleSignIn}
 			>
 				<BtnIcon>

@@ -1,45 +1,45 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
 import { DBAuth } from '../DB/Database';
 
 import Spinner from '../helpers/Spinner';
+import { setErrorMessage } from '../helpers/setErrorMessage';
 
 export default function AccountPageForm() {
-	const { activeUser, sendEmailVerification, user, setUser } = useContext(
-		AuthContext
-	);
+	const {
+		activeUser,
+		sendEmailVerification,
+		user,
+		setUser,
+		showReAuthForm,
+		hideReAuthForm,
+		setFormToAuthenticate,
+		setNewCredential,
+		updateSuccessful,
+		setUpdateSuccessful,
+	} = useContext(AuthContext);
 	const initialValues = { name: '', email: '', password: '' };
-	const [updateSuccessful, setUpdateSuccessful] = useState(false);
 
-	const AccountSchema = Yup.object().shape({
+	const nameSchema = Yup.object().shape({
 		name: Yup.string()
 			.min('2', 'Name must be a minimum of 2 characters')
 			.max('100', 'Name can only be a maximum of 100 characters'),
+	});
+	const emailSchema = Yup.object().shape({
 		email: Yup.string().email('Invalid email'),
-		password: Yup.string().min(8, 'Password must be a minimum of 8 characters'),
+	});
+	const passwordSchema = Yup.object().shape({
+		password: Yup.string()
+			.min(8, 'Password must be a minimum of 8 characters')
+			.required('Password required'),
 	});
 
-	const showSuccessMessage = () => {
-		setUpdateSuccessful(true);
-
-		setTimeout(() => {
-			setUpdateSuccessful(false);
-		}, 1000);
-	};
-
-	const handleDetailChange = formValues => {
+	const handleNameChange = name => {
 		const user = DBAuth.currentUser;
-		formValues.name !== '' && handleNameChange(formValues.name, user);
-		formValues.email !== '' && handleEmailChange(formValues.email, user);
-		formValues.password !== '' &&
-			handlePasswordChange(formValues.password, user);
-	};
-
-	const handleNameChange = (name, user) => {
 		setUser({
 			...user,
 			firstName: name.split(' ')[0],
@@ -50,35 +50,28 @@ export default function AccountPageForm() {
 			.updateProfile({
 				displayName: name,
 			})
-			.then(() => showSuccessMessage())
 			.catch(error => {
 				console.log(error.code + ':' + error.message);
 			});
-	};
-	const handleEmailChange = (email, user) => {
-		user
-			.updateEmail(email)
-			.then(() => {
-				showSuccessMessage();
-				sendEmailVerification();
-			})
-			.catch(error => {
-				console.log(error.code + ':' + error.message);
-			});
+
+		setUpdateSuccessful({ ...updateSuccessful, name: true });
 	};
 
-	const handlePasswordChange = (password, user) => {
-		user
-			.updatePassword(password)
-			.then(function() {
-				showSuccessMessage();
-			})
-			.catch(function(error) {
-				// An error happened.
-			});
+	const handleEmailChange = email => {
+		console.log(email);
+		showReAuthForm();
+		setNewCredential(email);
+		setFormToAuthenticate('email');
 	};
 
-	const handleDelete = () => {
+	const handlePasswordChange = password => {
+		showReAuthForm();
+		setNewCredential(password);
+		setFormToAuthenticate('password');
+	};
+
+	const handleDeleteAccount = e => {
+		e.preventDefault();
 		const user = DBAuth.currentUser;
 		user
 			.delete()
@@ -90,20 +83,20 @@ export default function AccountPageForm() {
 
 	return (
 		<FormContainer>
+			<h1>Change your details</h1>
 			<Formik
 				initialValues={initialValues}
-				validationSchema={AccountSchema}
+				validationSchema={nameSchema}
 				onSubmit={(values, actions) => {
-					handleDetailChange(values);
+					console.log('changing name');
+					handleNameChange(values.name);
 					setTimeout(() => {
 						actions.setSubmitting(false);
 					}, 1000);
 				}}
 			>
 				{props => (
-					<Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
-						{props.isSubmitting && <Spinner />}
-						<legend>Change your details</legend>
+					<Form onSubmit={props.handleSubmit}>
 						<InputContainer>
 							<Field
 								name='name'
@@ -115,15 +108,32 @@ export default function AccountPageForm() {
 								value={props.values.name}
 							/>
 							<button
-								type='button'
-								disabled={props.errors.password && props.touched.password}
+								type='submit'
+								disabled={props.errors.name && props.touched.name}
 							>
-								{updateSuccessful ? 'Updated' : 'Update'}
+								{updateSuccessful.name ? 'Updated' : 'Update'}
 							</button>
+
 							<Error errors={props.errors.name && props.touched.name}>
 								{props.errors.name}
 							</Error>
 						</InputContainer>
+					</Form>
+				)}
+			</Formik>
+
+			<Formik
+				initialValues={initialValues}
+				validationSchema={emailSchema}
+				onSubmit={(values, actions) => {
+					handleEmailChange(values.email);
+					setTimeout(() => {
+						actions.setSubmitting(false);
+					}, 1000);
+				}}
+			>
+				{props => (
+					<Form onSubmit={props.handleSubmit}>
 						<InputContainer>
 							<Field
 								name='email'
@@ -135,16 +145,31 @@ export default function AccountPageForm() {
 								value={props.values.email}
 							/>
 							<button
-								type='button'
-								disabled={props.errors.password && props.touched.password}
-								onClick={handleEmailChange}
+								type='submit'
+								disabled={props.errors.email && props.touched.email}
 							>
-								{updateSuccessful ? 'Updated' : 'Update'}
+								{updateSuccessful.email ? 'Updated' : 'Update'}
 							</button>
 							<Error errors={props.errors.email && props.touched.email}>
 								{props.errors.email}
 							</Error>
 						</InputContainer>
+					</Form>
+				)}
+			</Formik>
+
+			<Formik
+				initialValues={initialValues}
+				validationSchema={passwordSchema}
+				onSubmit={(values, actions) => {
+					handlePasswordChange(values.password);
+					setTimeout(() => {
+						actions.setSubmitting(false);
+					}, 1000);
+				}}
+			>
+				{props => (
+					<Form onSubmit={props.handleSubmit}>
 						<InputContainer>
 							<Field
 								name='password'
@@ -156,27 +181,23 @@ export default function AccountPageForm() {
 								value={props.values.password}
 							/>
 							<button
-								type='button'
+								type='submit'
 								disabled={props.errors.password && props.touched.password}
 							>
-								{updateSuccessful ? 'Updated' : 'Update'}
+								{updateSuccessful.password ? 'Updated' : 'Update'}
 							</button>
 							<Error errors={props.errors.password && props.touched.password}>
 								{props.errors.password}
 							</Error>
 						</InputContainer>
-						{/* <button
-							type='submit'
-							disabled={props.errors.password && props.touched.password}
-						>
-							{updateSuccessful ? 'Changes Submitted' : 'Submit Changes'}
-						</button> */}
 					</Form>
 				)}
 			</Formik>
 
 			<BottomContainer>
-				<button onClick={handleDelete}>Delete account</button>
+				<form onSubmit={handleDeleteAccount}>
+					<button type='submit'>Delete account</button>
+				</form>
 			</BottomContainer>
 		</FormContainer>
 	);
@@ -192,22 +213,18 @@ const FormContainer = styled.div`
 
 	min-width: 50vw;
 	min-height: 70vh;
-`;
 
-const Form = styled.form`
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	height: 100%;
-	width: 100%;
-	margin-bottom: 1rem;
-
-	legend {
+	h1 {
 		font-size: 2rem;
 		margin-bottom: 2rem;
 		font-weight: 600;
 		text-align: center;
 	}
+`;
+
+const Form = styled.form`
+	width: 100%;
+	margin-bottom: 1rem;
 
 	button {
 		padding: 0.5rem 1rem;
@@ -284,5 +301,5 @@ const Error = styled.div`
 	padding-left: 1rem;
 	opacity: ${props => (props.errors ? 1 : 0)};
 	transform: ${props =>
-		props.errors ? 'translateY(5px)' : 'translateY(-20px)'};
+		props.errors ? 'translateY(45px)' : 'translateY(10px)'};
 `;

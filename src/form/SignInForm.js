@@ -11,9 +11,7 @@ import Spinner from '../helpers/Spinner';
 
 export default function SignInForm() {
 	const initialValues = { email: '', password: '' };
-	const { errors, setErrors, setIsLoading, isLoading } = useContext(
-		AuthContext
-	);
+	const { errors, setErrors } = useContext(AuthContext);
 
 	const signInSchema = Yup.object().shape({
 		email: Yup.string()

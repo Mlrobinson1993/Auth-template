@@ -9,6 +9,7 @@ import SignUp from './pages/SignUp';
 import ProtectedPage from './pages/ProtectedPage';
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyEmail from './pages/VerifyEmail';
+import ForgottenEmailSent from './pages/ForgottenEmailSent';
 import Spinner from './helpers/Spinner';
 
 import { AuthContext } from './context/AuthContext';
@@ -43,6 +44,7 @@ function App() {
 			<Switch>
 				<Route Route exact path='/' component={Home} />
 				<Route Route exact path='/protectedpage' component={ProtectedPage} />
+				<Route exact path='/forgottenpassword' component={ForgotPassword} />
 				<Route Route exact path='/account' component={Account} />
 				<Redirect to='/' />
 			</Switch>
@@ -55,6 +57,7 @@ function App() {
 				<Route exact path='/signin' component={SignIn} />
 				<Route exact path='/signup' component={SignUp} />
 				<Route exact path='/forgottenpassword' component={ForgotPassword} />
+				<Route exact path='/emailsent' component={ForgottenEmailSent} />
 				<Redirect to='/signin' />
 			</Switch>
 		);
