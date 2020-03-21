@@ -49,7 +49,10 @@ export default function SignUpForm() {
 			.catch(error => {
 				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
-				console.log(error);
+
+				setTimeout(() => {
+					setErrors({ error: '' });
+				}, 4000);
 			});
 	};
 

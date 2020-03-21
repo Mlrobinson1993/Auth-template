@@ -22,10 +22,8 @@ function App() {
 			setIsLoading(false);
 		}, 1000);
 	}, []);
+
 	let routes;
-	if (activeUser) {
-		console.log(activeUser.uid);
-	}
 
 	//if is logged in and email is NOT verified
 	if (activeUser && activeUser.emailVerified === false) {

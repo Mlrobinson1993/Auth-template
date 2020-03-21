@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { Field, Formik } from 'formik';
@@ -6,17 +6,11 @@ import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
 import { DBAuth } from '../DB/Database';
 
-import Spinner from '../helpers/Spinner';
-import { setErrorMessage } from '../helpers/setErrorMessage';
-
 export default function AccountPageForm() {
 	const {
 		activeUser,
-		sendEmailVerification,
-		user,
 		setUser,
 		showReAuthForm,
-		hideReAuthForm,
 		setFormToAuthenticate,
 		setNewCredential,
 		updateSuccessful,
@@ -58,7 +52,6 @@ export default function AccountPageForm() {
 	};
 
 	const handleEmailChange = email => {
-		console.log(email);
 		showReAuthForm();
 		setNewCredential(email);
 		setFormToAuthenticate('email');
@@ -88,7 +81,6 @@ export default function AccountPageForm() {
 				initialValues={initialValues}
 				validationSchema={nameSchema}
 				onSubmit={(values, actions) => {
-					console.log('changing name');
 					handleNameChange(values.name);
 					setTimeout(() => {
 						actions.setSubmitting(false);

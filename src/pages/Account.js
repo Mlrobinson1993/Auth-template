@@ -6,7 +6,6 @@ import ReAuthForm from '../form/ReAuthForm';
 
 export default function Account() {
 	const { activeUser, isReAuthFormOpen } = useContext(AuthContext);
-	console.log(activeUser);
 
 	return (
 		<Container>

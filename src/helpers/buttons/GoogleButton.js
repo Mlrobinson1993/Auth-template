@@ -12,10 +12,7 @@ export default function GoogleButton({ text }) {
 				const token = res.credential.accessToken;
 				setActiveUser(res.user);
 			})
-			.catch(error => {
-				console.log(error.code);
-				console.log(error.message);
-			});
+			.catch(error => {});
 	};
 	return (
 		<>

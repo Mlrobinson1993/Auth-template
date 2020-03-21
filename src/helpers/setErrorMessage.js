@@ -15,6 +15,7 @@ export default function ErrorMessage({ message }) {
 const setErrorMessage = error => {
 	console.log(error);
 	let errorMsg = '';
+
 	switch (error.code) {
 		case 'auth/user-not-found':
 			errorMsg = 'No user found, please check the email address and try again';

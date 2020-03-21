@@ -57,7 +57,6 @@ const AuthProvider = ({ children }) => {
 				}
 			})
 			.catch(function(error) {
-				console.log(error);
 				isAuthenticated = false;
 				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
@@ -67,7 +66,7 @@ const AuthProvider = ({ children }) => {
 
 	const changeEmail = (isAuthenticated, email) => {
 		const user = DBAuth.currentUser;
-		console.log(newCredential);
+
 		if (isAuthenticated) {
 			user
 				.updateEmail(email)
@@ -75,29 +74,23 @@ const AuthProvider = ({ children }) => {
 					sendEmailVerification();
 					setUpdateSuccessful({ ...updateSuccessful, email: true });
 					hideReAuthForm();
-					console.log('email changed');
 				})
-				.catch(error => {
-					console.log(error.code + ':' + error.message);
-				});
+				.catch(error => {});
 		} else {
 			setErrorMessage('error: unknown');
 		}
 	};
 	const changePassword = (isAuthenticated, password) => {
 		const user = DBAuth.currentUser;
-		console.log(newCredential);
+
 		if (isAuthenticated) {
 			user
 				.updatePassword(password)
 				.then(() => {
 					setUpdateSuccessful({ ...updateSuccessful, password: true });
 					hideReAuthForm();
-					console.log('password changed');
 				})
-				.catch(function(error) {
-					console.log(error);
-				});
+				.catch(function(error) {});
 		} else {
 			setErrorMessage('error: unknown');
 		}

@@ -19,7 +19,6 @@ export default function VerifyEmailForm() {
 		DBAuth.sendPasswordResetEmail(email)
 			.then(setIsSubmitted(true))
 			.catch(error => {
-				console.log(error);
 				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
 			})

@@ -22,14 +22,14 @@ export default function SignInForm() {
 
 	const signInUser = (email, password) => {
 		DBAuth.signInWithEmailAndPassword(email, password)
-			.then(res => {
-				console.log('success');
-			})
+			.then(res => {})
 			.catch(error => {
-				console.log(error.code);
-				console.log(error.message);
 				const errorMessage = setErrorMessage(error);
 				setErrors({ error: errorMessage });
+
+				setTimeout(() => {
+					setErrors({ error: '' });
+				}, 4000);
 			});
 	};
 
